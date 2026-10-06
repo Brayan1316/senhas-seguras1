@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SecurePass - Gerador de Senhas</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #07111f, #102a43);
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            margin: auto;
+        }
+</script>
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.4rem;
+            color: #38bdf8;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #cbd5e1;
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid #334155;
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .password-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #password {
+            flex: 1;
+            background: #020617;
+            color: #38bdf8;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-family: monospace;
+            outline: none;
+        }
+
+        button {
+            border: none;
+            border-radius: 10px;
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .btn-copy {
+            background: #334155;
+            color: white;
+        }
+
+        .btn-generate {
+            width: 100%;
+            background: #0ea5e9;
+            color: white;
+            font-size: 1rem;
+            margin-top: 15px;
+        }
+
+        .btn-generate:hover {
+            background: #0284c7;
+        }
+
+        .option {
+            margin: 15px 0;
+        }
+
+        .option label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e2e8f0;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #0ea5e9;
+        }
+
+        .range-value {
+            color: #38bdf8;
+            font-weight: bold;
+        }
+
+        .checkboxes {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .checkbox {
+            background: #1e293b;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .checkbox input {
+            margin-right: 8px;
+            accent-color: #0ea5e9;
+        }
+
+        .strength {
+            margin-top: 20px;
+        }
+
+        .strength-bar {
+            height: 14px;
+            width: 100%;
+            background: #1e293b;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        #strengthFill {
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        #strengthText {
+            font-weight: bold;
+        }
+
+        .math-box {
+            background: #020617;
+            border-left: 4px solid #38bdf8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            line-height: 1.7;
+        }
+
+        .math-box code {
+            color: #38bdf8;
+            font-size: 1rem;
+        }
+
+        .tips {
+            margin-top: 20px;
+        }
+
+        .tips li {
+            margin: 10px 0;
+            color: #cbd5e1;
+        }
+
+        .security-status {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            background: #1e293b;
+        }
+
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            margin-top: 25px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .password-area {
+                flex-direction: column;
+            }
+
+            .checkboxes {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>🔐 SecurePass</h1>
+        <p>Gerador e analisador de senhas seguras</p>
+    </header>
+
+    <main>
+
+        <section class="card">
+
+            <h2>Gerar senha</h2>
+
+            <div class="password-area">
+                <input
+                    type="text"
+                    id="password"
+                    readonly
+                    placeholder="Sua senha aparecerá aqui"
+                >
+
+                <button class="btn-copy" onclick="copiarSenha()">
+                    Copiar
+                </button>
+            </div>
+
+            <div class="option">
+
+                <label>
+                    Tamanho:
+                    <span class="range-value" id="lengthValue">16</span>
+                    caracteres
+                </label>
+
+                <input
+                    type="range"
+                    id="length"
+                    min="8"
+                    max="64"
+                    value="16"
+                    oninput="atualizarTamanho()"
+                >
+
+            </div>
+
+            <div class="checkboxes">
+
+                <label class="checkbox">
+                    <input type="checkbox" id="uppercase" checked>
+                    Letras maiúsculas
+                </label>
+
+                <label class="checkbox">
+                    <input type="checkbox" id="lowercase" checked>
+                    Letras minúsculas
+                </label>
+
+                <label class="checkbox">
+                    <input type="checkbox" id="numbers" checked>
+                    Números
+                </label>
+
+                <label class="checkbox">
+                    <input type="checkbox" id="symbols" checked>
+                    Símbolos
+                </label>
+
+            </div>
+
+            <button class="btn-generate" onclick="gerarSenha()">
+                🔑 Gerar senha segura
+            </button>
+
+        </section>
+
+
+        <section class="card">
+
+            <h2>📊 Análise matemática</h2>
+
+            <div class="strength">
+
+                <p>
+                    Força da senha:
+                    <span id="strengthText">Aguardando senha</span>
+                </p>
+
+                <div class="strength-bar">
+                    <div id="strengthFill"></div>
+                </div>
+
+            </div>
+
+            <div class="math-box">
+
+                <p>
+                    <strong>Como calculamos?</strong>
+                </p>
+
+                <p>
+                    A quantidade aproximada de combinações possíveis é:
+                </p>
+
+                <p>
+                    <code>N = A<sup>L</sup></code>
+                </p>
+
+                <p>
+                    Onde:
+                </p>
+
+                <ul>
+                    <li><strong>A</strong> = tamanho do conjunto de caracteres</li>
+                    <li><strong>L</strong> = tamanho da senha</li>
+                    <li><strong>N</strong> = número de combinações possíveis</li>
+                </ul>
+
+                <p id="combinations">
+                    Gere uma senha para visualizar os cálculos.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <section class="card">
+
+            <h2>🛡️ Verificação de segurança</h2>
+
+            <div id="securityStatus" class="security-status">
+                Gere uma senha para iniciar a análise.
+            </div>
+
+            <div class="tips">
+
+                <h3>Boas práticas</h3>
+
+                <ul>
+                    <li>Use senhas com pelo menos 12 caracteres.</li>
+                    <li>Combine letras, números e símbolos.</li>
+                    <li>Evite nomes, datas e informações pessoais.</li>
+                    <li>Não reutilize a mesma senha em vários sites.</li>
+                    <li>Use autenticação de dois fatores quando disponível.</li>
+                    <li>Prefira senhas aleatórias e únicas.</li>
+                </ul>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        Projeto educacional de Segurança Digital © 2026
+    </footer>
+
+</div>
+
+
+<script>
+
+    /*
+     * ==========================================
+     * GERADOR DE SENHAS
+     * ==========================================
+     */
+
+    function gerarSenha() {
+
+        const tamanho = Number(
+            document.getElementById("length").value
+        );
+
+        const uppercase =
+</script>
+</script>
+</script>
+            document.getElementById("uppercase").checked;
+
+        const lowercase =
+            document.getElementById("lowercase").checked;
+
+        const numbers =
+            document.getElementById("numbers").checked;
+
+        const symbols =
+            document.getElementById("symbols").checked;
+
+
+        let caracteres = "";
+
+        if (uppercase) {
+            caracteres += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        }
+
+        if (lowercase) {
+            caracteres += "abcdefghijklmnopqrstuvwxyz";
+        }
+
+        if (numbers) {
+            caracteres += "0123456789";
+        }
+
+        if (symbols) {
+            caracteres += "!@#$%^&*()_+-=[]{}|;:,.<>?";
+        }
+
+
+        if (caracteres.length === 0) {
+
+            alert(
+                "Selecione pelo menos um tipo de caractere."
+            );
+
+            return;
+        }
+
+
+        /*
+         * crypto.getRandomValues() é utilizado
+         * em vez de Math.random().
+         *
+         * Isso fornece aleatoriedade mais
+         * apropriada para geração de senhas.
+         */
+
+        const valores =
+            new Uint32Array(tamanho);
+
+        crypto.getRandomValues(valores);
+
+
+        let senha = "";
+
+        for (let i = 0; i < tamanho; i++) {
+
+            const indice =
+                valores[i] % caracteres.length;
+
+            senha += caracteres[indice];
+        }
+
+
+        document.getElementById("password").value = senha;
+
+        analisarSenha(
+            senha,
+            caracteres.length
+        );
+    }
+
+
+    /*
+     * ==========================================
+     * ANÁLISE DA SENHA
+     * ==========================================
+     */
+
+    function analisarSenha(senha, tamanhoAlfabeto) {
+
+        const tamanho = senha.length;
+
+
+        /*
+         * Fórmula:
+         *
+         * N = A^L
+         *
+         * Para evitar números gigantes,
+         * usamos log10:
+         *
+         * log10(N) = L × log10(A)
+         */
+</script>
+</script>
+</script>
+
+        const logCombinacoes =
+            tamanho *
+            Math.log10(tamanhoAlfabeto);
+
+
+        let pontos = 0;
+
+
+</script>
+</script>
+</script>
+        // Tamanho
+        if (tamanho >= 12) pontos += 25;
+        if (tamanho >= 16) pontos += 15;
+        if (tamanho >= 20) pontos += 10;
+
+
+        // Diversidade
+        if (/[A-Z]/.test(senha)) pontos += 10;
+        if (/[a-z]/.test(senha)) pontos += 10;
+        if (/[0-9]/.test(senha)) pontos += 10;
+        if (/[^A-Za-z0-9]/.test(senha)) pontos += 20;
+
+
+        if (pontos > 100) {
+            pontos = 100;
+        }
+
+
+        const fill =
+</script>
+</script>
+</script>
+            document.getElementById("strengthFill");
+
+        const text =
+            document.getElementById("strengthText");
+
+
+        fill.style.width = pontos + "%";
+
+
+        if (pontos < 40) {
+</script>
+</script>
+</script>
+
+            fill.style.background = "#ef4444";
+            text.textContent = "Fraca";
+            text.style.color = "#ef4444";
+
+        } else if (pontos < 70) {
+
+            fill.style.background = "#f59e0b";
+            text.textContent = "Média";
+            text.style.color = "#f59e0b";
+
+        } else if (pontos < 90) {
+
+            fill.style.background = "#22c55e";
+            text.textContent = "Forte";
+            text.style.color = "#22c55e";
+
+        } else {
+
+            fill.style.background = "#06b6d4";
+            text.textContent = "Muito forte";
+            text.style.color = "#06b6d4";
+        }
+
+
+        /*
+         * ======================================
+         * EXIBIÇÃO MATEMÁTICA
+         * ======================================
+         */
+
+        let combinacoesTexto;
+
+
+        if (logCombinacoes < 6) {
+
+            const combinacoes =
+                Math.pow(
+                    tamanhoAlfabeto,
+                    tamanho
+                );
+
+            combinacoesTexto =
+                combinacoes.toLocaleString("pt-BR");
+
+        } else {
+
+            combinacoesTexto =
+                "aproximadamente 10^" +
+                logCombinacoes.toFixed(1);
+        }
+
+
+        document.getElementById("combinations").innerHTML =
+
+            `Esta senha possui <strong>${tamanho}</strong>
+            caracteres e utiliza um conjunto de
+            aproximadamente <strong>${tamanhoAlfabeto}</strong>
+            caracteres possíveis.<br><br>
+
+            Portanto:<br>
+
+            <code>
+                N = ${tamanhoAlfabeto}<sup>${tamanho}</sup>
+            </code>
+
+            <br><br>
+
+            Número aproximado de combinações:
+            <strong>${combinacoesTexto}</strong>`;
+
+
+        /*
+         * ======================================
+         * VERIFICAÇÕES DE SEGURANÇA
+         * ======================================
+         */
+
+        let problemas = [];
+
+
+        if (tamanho < 12) {
+            problemas.push(
+                "A senha possui menos de 12 caracteres."
+            );
+        }
+
+        if (!/[A-Z]/.test(senha)) {
+            problemas.push(
+                "Não possui letras maiúsculas."
+            );
+        }
+
+        if (!/[a-z]/.test(senha)) {
+            problemas.push(
+                "Não possui letras minúsculas."
+            );
+        }
+
+        if (!/[0-9]/.test(senha)) {
+            problemas.push(
+                "Não possui números."
+            );
+        }
+
+        if (!/[^A-Za-z0-9]/.test(senha)) {
+            problemas.push(
+                "Não possui símbolos."
+            );
+        }
+
+
+        const status =
+            document.getElementById("securityStatus");
+
+
+        if (problemas.length === 0) {
+
+            status.style.background =
+                "rgba(34, 197, 94, 0.15)";
+
+            status.style.color = "#86efac";
+
+            status.innerHTML =
+                "✅ Esta senha atende aos principais critérios de segurança.";
+
+        } else {
+
+            status.style.background =
+                "rgba(245, 158, 11, 0.15)";
+
+            status.style.color = "#fcd34d";
+
+            status.innerHTML =
+                "⚠️ Pontos que podem ser melhorados:<br><br>" +
+                problemas.map(
+                    problema => "• " + problema
+                ).join("<br>");
+        }
+    }
+
+
+    /*
+     * ==========================================
+     * COPIAR SENHA
+     * ==========================================
+     */
+
+    async function copiarSenha() {
+
+        const senha =
+            document.getElementById("password").value;
+
+
+        if (!senha) {
+
+            alert("Gere uma senha primeiro.");
+
+            return;
+        }
+
+
+        try {
+
+            await navigator.clipboard.writeText(senha);
+
+            alert("Senha copiada para a área de transferência!");
+
+        } catch (erro) {
+
+            alert(
+                "Não foi possível copiar automaticamente."
+            );
+        }
+    }
+
+
+    /*
+     * ==========================================
+     * ATUALIZAR TAMANHO
+     * ==========================================
+     */
+
+    function atualizarTamanho() {
+
+        const tamanho =
+            document.getElementById("length").value;
+
+        document.getElementById("lengthValue")
+            .textContent = tamanho;
+    }
+
+
+    /*
+     * Gera uma senha automaticamente
+     * quando a página é aberta.
+     */
+
+    gerarSenha();
+
+</script>
+
+</body>
+</html>
